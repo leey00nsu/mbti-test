@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import styles from "../App.module.css";
 import { resultData } from "../constants/resultData";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 const ResultPage = () => {
   const { mbti } = useParams();
@@ -8,6 +9,22 @@ const ResultPage = () => {
   const resultMBTIData = resultData.find((data) => data.mbti === mbti);
 
   const resultDesc = resultMBTIData.desc.split("\n");
+
+  useEffect(() => {
+    if (!Kakao.isInitialized()) {
+      Kakao.init("4fa305e9da664d7305f5647b7f1ff172");
+    }
+  }, []);
+
+  const clickShareHandler = () => {
+    Kakao.Share.sendCustom({
+      templateId: 99094,
+      templateArgs: {
+        THU: "https://mbti-test-mauve.vercel.app" + resultMBTIData.image,
+        MATCH_CAT: resultMBTIData.match_cat,
+      },
+    });
+  };
 
   return (
     <div className={styles.layout}>
@@ -22,6 +39,13 @@ const ResultPage = () => {
           {desc}
         </p>
       ))}
+
+      <button onClick={clickShareHandler} className={styles.square_button}>
+        카카오톡 공유하기
+      </button>
+      <Link to="/" className={styles.square_button}>
+        다시 해보기
+      </Link>
     </div>
   );
 };
